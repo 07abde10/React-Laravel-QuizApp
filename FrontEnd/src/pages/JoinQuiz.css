@@ -1,0 +1,255 @@
+/* Join Quiz Page Container */
+.join-page {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #f8f9fa 0%, #e9ecef 100%);
+  position: relative;
+}
+
+/* Join Card */
+.join-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header with Logout */
+.join-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+/* Typography */
+.join-card h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Logout Button */
+.btn-logout {
+  padding: 0.625rem 1.25rem;
+  background: #ffffff;
+  color: #495057;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+.btn-logout:active {
+  background: #e9ecef;
+}
+
+/* Form Styling */
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.join-form input {
+  padding: 1rem 1.25rem;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #212529;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.join-form input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.08);
+  background-color: #ffffff;
+}
+
+.join-form input::placeholder {
+  color: #adb5bd;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: normal;
+}
+
+.join-form input:hover:not(:focus) {
+  border-color: #ced4da;
+}
+
+/* Button Styling */
+.join-form .btn-primary {
+  padding: 1rem 1.5rem;
+  background: #4a90e2;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.15);
+  width: 100%;
+}
+
+.join-form .btn-primary:hover {
+  background: #3a7bc8;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+  transform: translateY(-1px);
+}
+
+.join-form .btn-primary:active {
+  background: #2e6bb3;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(74, 144, 226, 0.15);
+}
+
+/* Error Message */
+.join-error {
+  background: #fff5f5;
+  color: #c92a2a;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  border: 1px solid #ffe3e3;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  animation: shake 0.4s ease;
+}
+
+.join-error::before {
+  content: '⚠';
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Responsive Design - Tablet */
+@media (min-width: 768px) {
+  .join-card {
+    max-width: 520px;
+    padding: 3.5rem 3rem;
+  }
+
+  .join-card h2 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Responsive Design - Mobile */
+@media (max-width: 640px) {
+  .join-page {
+    padding: 1rem;
+  }
+
+  .join-card {
+    padding: 2rem 1.5rem;
+    border-radius: 10px;
+    max-width: 100%;
+  }
+
+  .join-card h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .join-form input {
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .join-form .btn-primary {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* Responsive Design - Small Mobile */
+@media (max-width: 480px) {
+  .join-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .join-card h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Improve input autofill styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 30px white inset !important;
+  -webkit-text-fill-color: #212529 !important;
+}
