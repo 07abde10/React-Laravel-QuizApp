@@ -20,10 +20,7 @@ export default function Login() {
 
     try {
       const response = await authService.login(formData);
-      const { user, token } = response.data.data;
-      
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      const { user } = response.data.data;
       
       // Navigate based on user role
       if (user.role === 'Administrateur') {
@@ -82,17 +79,17 @@ export default function Login() {
           Don't have an account? <a href="/register">Register here</a>
         </p>
 
-        <div className="test-credentials">
+        {/* <div className="test-credentials">
           <h4>Test :</h4>
           <p>etudiant1@example.com</p>
           <p>password123</p>
 
           <p>prof.karim@example.com</p>
           <p>password123</p>
-          
+
           <p>admin0@quiz.com</p>
           <p>password123</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

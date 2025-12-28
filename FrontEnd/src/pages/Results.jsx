@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { attemptService } from '../services/api';
-import './Results.css';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { attemptService } from "../services/api";
+import "./Results.css";
 
 export default function Results() {
   const { attemptId } = useParams();
@@ -11,9 +11,11 @@ export default function Results() {
     const loadResults = async () => {
       try {
         const res = await attemptService.getAttempt(attemptId);
+
+        console.log(res.data);
         setAttempt(res.data.data);
       } catch (e) {
-        console.error('Failed to load results:', e);
+        console.error(e);
       }
     };
 
@@ -24,14 +26,14 @@ export default function Results() {
     return (
       <div className="results-error">
         <h2>Results Not Found</h2>
-        <button className="btn-primary" onClick={() => navigate('/join')}>
+        <button className="btn-primary" onClick={() => navigate("/join")}>
           Back
         </button>
       </div>
     );
   }
 
-  const passed = attempt.score >= 50;
+  const passed = attempt.score >= 70;
 
   return (
     <div className="results-page">
@@ -59,7 +61,7 @@ export default function Results() {
                 strokeWidth="8"
                 strokeDasharray={`${(attempt.score || 0) * 3.39} 339`}
                 style={{
-                  stroke: passed ? '#27ae60' : '#e74c3c'
+                  stroke: passed ? "#27ae60" : "#e74c3c",
                 }}
               />
             </svg>
@@ -69,12 +71,12 @@ export default function Results() {
             </div>
           </div>
 
-          <div className={`status-badge ${passed ? 'passed' : 'failed'}`}>
-            <span className="status-text">{passed ? 'PASSED' : 'FAILED'}</span>
+          <div className={`status-badge ${passed ? "passed" : "failed"}`}>
+            <p className="status-text">{passed ? "PASSED" : "FAILED"}</p>
           </div>
         </div>
         <div className="results-actions">
-          <button className="btn-secondary" onClick={() => navigate('/join')}>
+          <button className="btn-secondary" onClick={() => navigate("/join")}>
             Take Another Quiz
           </button>
         </div>

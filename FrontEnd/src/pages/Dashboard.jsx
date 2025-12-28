@@ -15,29 +15,14 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          const userData = JSON.parse(userStr);
-          setUser(userData);
-          
-          // If professor, get their quizzes only
-          if (userData.role === 'Professeur' && userData.professeur?.id) {
-            const quizzesResponse = await quizService.getAllQuizzes({ 
-              professeur_id: userData.professeur.id,
-              per_page: 50 
-            });
-            setQuizzes(quizzesResponse.data.data.data || []);
-          } else {
-            // For students, get all available quizzes
-            const quizzesResponse = await quizService.getAllQuizzes({ per_page: 10 });
-            setQuizzes(quizzesResponse.data.data.data || []);
-          }
-        }
+        // Get quizzes for the first professor in the database
+        const quizzesResponse = await quizService.getAllQuizzes({ 
+          professeur_id: 1, // Use first professor
+          per_page: 50 
+        });
+        setQuizzes(quizzesResponse.data.data.data || []);
       } catch (error) {
         console.error('Error fetching data:', error);
-        if (error.response?.status === 401) {
-          navigate('/login');
-        }
       } finally {
         setLoading(false);
       }
@@ -47,21 +32,7 @@ export default function Dashboard() {
   }, [navigate]);
 
   const handleQuizClick = async (quiz) => {
-    if (user?.role === 'Professeur') {
-      setSelectedQuiz(quiz);
-      setAnalyticsLoading(true);
-      try {
-        const response = await quizService.getQuizStatistics(quiz.id);
-        setAnalytics(response.data.data);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-        setAnalytics(null);
-      } finally {
-        setAnalyticsLoading(false);
-      }
-    } else {
-      navigate(`/quiz/${quiz.id}`);
-    }
+    navigate(`/quiz/${quiz.id}`);
   };
 
   const handleLogout = async () => {
@@ -70,7 +41,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       navigate('/login');
     }
@@ -86,12 +56,10 @@ export default function Dashboard() {
         <div className="header-content">
           <h1>Quiz App</h1>
           <div className="user-menu">
-            <span>Welcome, {user?.prenom} {user?.nom}!</span>
-            {user?.role === 'Professeur' && (
-              <button onClick={() => navigate('/quizzes/create')} className="btn-create">
-                Create Quiz
-              </button>
-            )}
+            <span>Welcome to Quiz App!</span>
+            <button onClick={() => navigate('/quizzes/create')} className="btn-create">
+              Create Quiz
+            </button>
             <button onClick={handleLogout} className="btn-logout">
               Logout
             </button>
@@ -102,11 +70,11 @@ export default function Dashboard() {
       <main className="dashboard-main">
         <div className="dashboard-content">
           <section className="quizzes-section">
-            <h2>{user?.role === 'Professeur' ? 'My Quizzes' : 'Available Quizzes'}</h2>
+            <h2>My Quizzes</h2>
             
             {quizzes.length === 0 ? (
               <p className="no-quizzes">
-                {user?.role === 'Professeur' ? 'No quizzes created yet' : 'No quizzes available'}
+                No quizzes created yet. Click "Create Quiz" to get started.
               </p>
             ) : (
               <div className="quizzes-grid">
@@ -123,9 +91,7 @@ export default function Dashboard() {
                       <span>📝 {quiz.questions?.length || 0} questions</span>
                       <span>🔑 {quiz.code_quiz}</span>
                     </div>
-                    {user?.role !== 'Professeur' && (
-                      <button className="btn-primary">Start Quiz</button>
-                    )}
+                    <button className="btn-primary">Start Quiz</button>
                   </div>
                 ))}
               </div>

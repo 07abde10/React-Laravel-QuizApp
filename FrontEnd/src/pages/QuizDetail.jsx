@@ -41,7 +41,6 @@ export default function QuizDetail() {
       const u = JSON.parse(stored);
       if (u.etudiant && u.etudiant.id) return u.etudiant.id;
     }
-    // fallback: call profile
     try {
       const p = await authService.getProfile();
       return p.data.data.etudiant?.id || null;
@@ -50,15 +49,11 @@ export default function QuizDetail() {
     }
   };
 
-  const startAttempt = async () => {
-    const etudiantId = await findStudentId();
-    if (!etudiantId) {
-      alert('Student id not found. Make sure you are logged in as a student.');
-      return;
-    }
+  console.log(findStudentId);
 
+  const startAttempt = async () => {
     try {
-      const payload = { etudiant_id: etudiantId, quiz_id: parseInt(id, 10), date_passage: new Date().toISOString() };
+      const payload = { quiz_id: parseInt(id, 10) };
       const res = await attemptService.startAttempt(payload);
       setAttempt(res.data.data);
 
@@ -113,7 +108,7 @@ export default function QuizDetail() {
     const s = (secs % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
-  
+
   if (!quiz) return <div className="qd-error">Quiz not found</div>;
 
   return (

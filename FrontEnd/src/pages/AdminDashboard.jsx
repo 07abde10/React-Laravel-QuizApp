@@ -29,15 +29,18 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const table = tables.find(t => t.key === activeTab);
+      console.log('Loading data for:', table.endpoint);
       const response = await fetch(`http://localhost:8000/api${table.endpoint}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
         }
       });
       
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log('Response data:', result);
         if (table.isStats) {
           setStats(result.data);
           setData([]);
@@ -45,11 +48,15 @@ export default function AdminDashboard() {
           setData(result.data?.data || result.data || []);
           setStats(null);
         }
+      } else {
+        console.error('Response not ok:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error loading data:', error);
       setData([]);
       setStats(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,7 +85,6 @@ export default function AdminDashboard() {
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -105,7 +111,6 @@ export default function AdminDashboard() {
       const response = await fetch(`http://localhost:8000/api${table.endpoint}/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'application/json'
         }
       });
@@ -124,7 +129,6 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       navigate('/login');
     }

@@ -55,21 +55,6 @@ class QuizController extends Controller
     public function store(Request $request)
     {
         try {
-            $user = $request->user();
-            
-            // Get or create professor record for authenticated user
-            if ($user && $user->role === 'Professeur') {
-                $prof = $user->professeur;
-                if (!$prof) {
-                    // Create professor record if it doesn't exist
-                    $prof = Professeur::create([
-                        'user_id' => $user->id,
-                        'specialite' => 'General'
-                    ]);
-                }
-                $request->merge(['professeur_id' => $prof->id]);
-            }
-
             // Validate input
             $validated = $request->validate([
                 'professeur_id' => 'nullable|exists:professeurs,id',
@@ -84,12 +69,12 @@ class QuizController extends Controller
                 'actif' => 'nullable|boolean',
             ]);
 
-            // Ensure professeur_id is set
+            // Set default professor if none provided
             if (!isset($validated['professeur_id'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Only professors can create quizzes'
-                ], 403);
+                $firstProfessor = Professeur::first();
+                if ($firstProfessor) {
+                    $validated['professeur_id'] = $firstProfessor->id;
+                }
             }
 
             // Generate unique quiz code

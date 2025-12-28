@@ -40,13 +40,10 @@ class AuthController extends Controller
                 ]);
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
                 'success' => true,
                 'data' => [
                     'user' => $user,
-                    'token' => $token,
                 ],
                 'message' => 'User registered successfully'
             ], 201);
@@ -88,13 +85,10 @@ class AuthController extends Controller
                 $user->load('etudiant');
             }
 
-            $token = $user->createToken('auth_token')->plainTextToken;
-
             return response()->json([
                 'success' => true,
                 'data' => [
                     'user' => $user,
-                    'token' => $token,
                 ],
                 'message' => 'Login successful'
             ]);
@@ -114,131 +108,39 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        try {
-            $request->user()->currentAccessToken()->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout successful'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Logout failed: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout successful'
+        ]);
     }
 
     public function profile(Request $request)
     {
-        try {
-            $user = $request->user();
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not authenticated'
-                ], 401);
-            }
-
-            $profile = [
-                'id' => $user->id,
-                'nom' => $user->nom,
-                'prenom' => $user->prenom,
-                'email' => $user->email,
-                'role' => $user->role,
-            ];
-
-            if ($user->role === 'Professeur') {
-                $profile['professeur'] = $user->professeur;
-            } elseif ($user->role === 'Etudiant') {
-                $profile['etudiant'] = $user->etudiant;
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $profile,
-                'message' => 'Profile retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve profile: ' . $e->getMessage()
-            ], 500);
-        }
+        // Since we removed authentication, return a generic response
+        return response()->json([
+            'success' => true,
+            'data' => null,
+            'message' => 'Profile endpoint - authentication disabled'
+        ]);
     }
 
     public function updateProfile(Request $request)
     {
-        try {
-            $user = $request->user();
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not authenticated'
-                ], 401);
-            }
-
-            $validated = $request->validate([
-                'nom' => 'sometimes|required|string|max:100',
-                'prenom' => 'sometimes|required|string|max:100',
-                'email' => 'sometimes|required|email|max:150|unique:utilisateurs,email,' . $user->id,
-                'password' => 'sometimes|required|string|min:8|confirmed',
-            ]);
-
-            if (isset($validated['password'])) {
-                $validated['password'] = Hash::make($validated['password']);
-            }
-
-            $user->update($validated);
-
-            return response()->json([
-                'success' => true,
-                'data' => $user,
-                'message' => 'Profile updated successfully'
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-                'message' => 'Validation failed'
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update profile: ' . $e->getMessage()
-            ], 500);
-        }
+        // Since we removed authentication, return a generic response
+        return response()->json([
+            'success' => true,
+            'data' => null,
+            'message' => 'Profile update endpoint - authentication disabled'
+        ]);
     }
 
     public function refreshToken(Request $request)
     {
-        try {
-            $user = $request->user();
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not authenticated'
-                ], 401);
-            }
-
-            $user->tokens()->delete();
-            $newToken = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'token' => $newToken,
-                ],
-                'message' => 'Token refreshed successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to refresh token: ' . $e->getMessage()
-            ], 500);
-        }
+        // Since we removed authentication, return a generic response
+        return response()->json([
+            'success' => true,
+            'data' => null,
+            'message' => 'Token refresh endpoint - authentication disabled'
+        ]);
     }
 }

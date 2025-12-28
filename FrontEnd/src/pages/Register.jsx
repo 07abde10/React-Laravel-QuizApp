@@ -1,22 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/api';
-import './Auth.css';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../services/api";
+import "./Auth.css";
 
 export default function Register() {
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    role: 'Etudiant',
-    numero_etudiant: '',
-    groupe_id: '',
-    specialite: ''
+    nom: "",
+    prenom: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
+    role: "Etudiant",
+    numero_etudiant: "",
+    groupe_id: "",
+    specialite: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [groups, setGroups] = useState([]);
   const [specializations, setSpecializations] = useState([]);
   const navigate = useNavigate();
@@ -26,12 +25,12 @@ export default function Register() {
       try {
         const [groupsResponse, specializationsResponse] = await Promise.all([
           authService.getGroups(),
-          authService.getSpecializations()
+          authService.getSpecializations(),
         ]);
         setGroups(groupsResponse.data.data);
         setSpecializations(specializationsResponse.data.data);
       } catch (err) {
-        console.error('Failed to fetch data:', err);
+        console.error("Failed to fetch data:", err);
       }
     };
 
@@ -44,37 +43,32 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setError("");
 
     if (formData.password !== formData.password_confirmation) {
-      setError('Passwords do not match');
-      setLoading(false);
+      setError("Passwords do not match");
       return;
     }
 
     try {
       const response = await authService.register(formData);
-      localStorage.setItem('authToken', response.data.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
-      
-      if (formData.role === 'Etudiant') {
-        navigate('/join');
+      console.log(response);
+
+      if (formData.role === "Etudiant") {
+        navigate("/join");
       } else {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     } catch (err) {
       const errorMsg = err.response?.data?.errors
-        ? Object.values(err.response.data.errors).flat().join(', ')
-        : err.response?.data?.message || 'Registration failed';
+        ? Object.values(err.response.data.errors).flat().join(", ")
+        : err.response?.data?.message || "Registration failed";
       setError(errorMsg);
-    } finally {
-      setLoading(false);
     }
   };
 
   const renderRoleSpecificFields = () => {
-    if (formData.role === 'Etudiant') {
+    if (formData.role === "Etudiant") {
       return (
         <>
           <div className="form-group">
@@ -89,7 +83,12 @@ export default function Register() {
           </div>
           <div className="form-group">
             <label>Group</label>
-            <select name="groupe_id" value={formData.groupe_id} onChange={handleChange} required>
+            <select
+              name="groupe_id"
+              value={formData.groupe_id}
+              onChange={handleChange}
+              required
+            >
               <option value="">Select Group</option>
               {groups.map((group) => (
                 <option key={group.id} value={group.id}>
@@ -101,8 +100,8 @@ export default function Register() {
         </>
       );
     }
-    
-    if (formData.role === 'Professeur') {
+
+    if (formData.role === "Professeur") {
       return (
         <div className="form-group">
           <label>Specialization</label>
@@ -122,7 +121,7 @@ export default function Register() {
         </div>
       );
     }
-    
+
     return null;
   };
 
@@ -131,7 +130,7 @@ export default function Register() {
       <div className="auth-card">
         <h1>Quiz App</h1>
         <h2>Register</h2>
-        
+
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
@@ -174,7 +173,12 @@ export default function Register() {
 
           <div className="form-group">
             <label>Role</label>
-            <select name="role" value={formData.role} onChange={handleChange} required>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
               <option value="Etudiant">Student</option>
               <option value="Professeur">Professor</option>
             </select>
@@ -208,8 +212,8 @@ export default function Register() {
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Registering...' : 'Register'}
+          <button type="submit"  className="btn-primary">
+            "Register"
           </button>
         </form>
 
