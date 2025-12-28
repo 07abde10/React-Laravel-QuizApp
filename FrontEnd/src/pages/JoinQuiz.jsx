@@ -45,7 +45,7 @@ export default function JoinQuiz() {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="join-form">
-          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter code (e.g. QUIZ-ABC123)" required />
+          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter code quiz" required />
           <button className="btn-primary">Join</button>
         </form>
         {error && <div className="join-error">{error}</div>}
