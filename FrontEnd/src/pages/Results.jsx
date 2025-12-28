@@ -7,8 +7,6 @@ export default function Results() {
   const { attemptId } = useParams();
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState(null);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadResults = async () => {
       try {
@@ -16,38 +14,24 @@ export default function Results() {
         setAttempt(res.data.data);
       } catch (e) {
         console.error('Failed to load results:', e);
-      } finally {
-        setLoading(false);
       }
     };
 
     loadResults();
   }, [attemptId]);
 
-  if (loading) {
-    return (
-      <div className="results-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading results...</p>
-      </div>
-    );
-  }
-
   if (!attempt) {
     return (
       <div className="results-error">
-        <div className="error-icon">⚠️</div>
         <h2>Results Not Found</h2>
-        <p>We couldn't find the results for this quiz attempt.</p>
-        <button className="btn-primary" onClick={() => navigate('/dashboard')}>
-          Back to Dashboard
+        <button className="btn-primary" onClick={() => navigate('/join')}>
+          Back
         </button>
       </div>
     );
   }
 
   const passed = attempt.score >= 50;
-  console.log(attempt.score);
 
   return (
     <div className="results-page">
@@ -86,30 +70,10 @@ export default function Results() {
           </div>
 
           <div className={`status-badge ${passed ? 'passed' : 'failed'}`}>
-            <span className="status-icon">{passed ? '✓' : '✗'}</span>
             <span className="status-text">{passed ? 'PASSED' : 'FAILED'}</span>
           </div>
-
-          <div className="results-details">
-            <div className="detail-item">
-              <span className="detail-label">Date</span>
-              <span className="detail-value">
-                {attempt.date_passage ? new Date(attempt.date_passage).toLocaleDateString() : 'N/A'}
-              </span>
-            </div>
-            {attempt.duree_passage && (
-              <div className="detail-item">
-                <span className="detail-label">Time Taken</span>
-                <span className="detail-value">{attempt.duree_passage} mins</span>
-              </div>
-            )}
-          </div>
         </div>
-
         <div className="results-actions">
-          <button className="btn-primary" onClick={() => navigate('/dashboard')}>
-            Explore Quizzes
-          </button>
           <button className="btn-secondary" onClick={() => navigate('/join')}>
             Take Another Quiz
           </button>

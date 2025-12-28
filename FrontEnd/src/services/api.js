@@ -50,7 +50,9 @@ export const moduleService = {
 export const quizService = {
   getAllQuizzes: (params) => apiClient.get('/quizzes', { params }),
   getQuiz: (id) => apiClient.get(`/quizzes/${id}`),
+
   getQuizByCode: (code) => apiClient.get(`/quizzes/code/${code}`),
+  
   createQuiz: (data) => apiClient.post('/quizzes', data),
   updateQuiz: (id, data) => apiClient.put(`/quizzes/${id}`, data),
   deleteQuiz: (id) => apiClient.delete(`/quizzes/${id}`),

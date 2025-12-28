@@ -5,33 +5,29 @@ import './JoinQuiz.css';
 
 export default function JoinQuiz() {
   const [code, setCode] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    console.log('Searching for quiz with code:', code.trim());
     try {
       const res = await quizService.getQuizByCode(code.trim());
+
+      console.log(res)
+
       console.log('Quiz found:', res.data);
       const quiz = res.data.data;
       navigate(`/quiz/${quiz.id}`);
     } catch (err) {
       console.error('Error finding quiz:', err);
-      setError(err.response?.data?.message || 'Quiz not found');
     }
   };
 
   const handleLogout = async () => {
     try {
       await authService.logout();
+      navigate('/login');
     } catch (e) {
       console.error('Logout error:', e);
-    } finally {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      navigate('/login');
     }
   };
 
@@ -48,7 +44,6 @@ export default function JoinQuiz() {
           <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter code quiz" required />
           <button className="btn-primary">Join</button>
         </form>
-        {error && <div className="join-error">{error}</div>}
       </div>
     </div>
   );
