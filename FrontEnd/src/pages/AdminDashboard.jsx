@@ -80,6 +80,10 @@ export default function AdminDashboard() {
         if (table.isStats) {
           setStats(result.data);
           setData([]);
+        } else {
+          const tableData = result.data?.data || result.data || [];
+          setData(Array.isArray(tableData) ? tableData : []);
+          setStats(null);
         }
       }
     } catch (error) {
