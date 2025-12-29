@@ -61,7 +61,6 @@ Route::prefix('quizzes')->group(function () {
 Route::prefix('questions')->group(function () {
     Route::get('/', [QuestionController::class, 'index']);
     Route::post('/', [QuestionController::class, 'store']);
-    Route::post('/bulk', [QuestionController::class, 'bulkCreate']);
     Route::get('/{id}', [QuestionController::class, 'show']);
     Route::put('/{id}', [QuestionController::class, 'update']);
     Route::delete('/{id}', [QuestionController::class, 'destroy']);
@@ -82,7 +81,6 @@ Route::prefix('attempts')->group(function () {
 Route::prefix('responses')->group(function () {
     Route::get('/', [ReponseEtudiantController::class, 'index']);
     Route::post('/', [ReponseEtudiantController::class, 'store']);
-    Route::post('/bulk', [ReponseEtudiantController::class, 'bulkSubmit']);
     Route::get('/{id}', [ReponseEtudiantController::class, 'show']);
     Route::put('/{id}', [ReponseEtudiantController::class, 'update']);
     Route::delete('/{id}', [ReponseEtudiantController::class, 'destroy']);
@@ -92,7 +90,6 @@ Route::prefix('responses')->group(function () {
 Route::prefix('choices')->group(function () {
     Route::get('/', [ChoixReponseController::class, 'index']);
     Route::post('/', [ChoixReponseController::class, 'store']);
-    Route::post('/bulk', [ChoixReponseController::class, 'bulkCreate']);
     Route::get('/{id}', [ChoixReponseController::class, 'show']);
     Route::put('/{id}', [ChoixReponseController::class, 'update']);
     Route::delete('/{id}', [ChoixReponseController::class, 'destroy']);

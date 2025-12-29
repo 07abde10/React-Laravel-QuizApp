@@ -113,34 +113,4 @@ class AuthController extends Controller
             'message' => 'Logout successful'
         ]);
     }
-
-    public function profile(Request $request)
-    {
-        // Since we removed authentication, return a generic response
-        return response()->json([
-            'success' => true,
-            'data' => null,
-            'message' => 'Profile endpoint - authentication disabled'
-        ]);
-    }
-
-    public function updateProfile(Request $request)
-    {
-        // Since we removed authentication, return a generic response
-        return response()->json([
-            'success' => true,
-            'data' => null,
-            'message' => 'Profile update endpoint - authentication disabled'
-        ]);
-    }
-
-    public function refreshToken(Request $request)
-    {
-        // Since we removed authentication, return a generic response
-        return response()->json([
-            'success' => true,
-            'data' => null,
-            'message' => 'Token refresh endpoint - authentication disabled'
-        ]);
-    }
 }

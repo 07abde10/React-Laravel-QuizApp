@@ -191,41 +191,4 @@ class ChoixReponseController extends Controller
             ], 500);
         }
     }
-
-    public function bulkCreate(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'question_id' => 'required|exists:questions,id',
-                'choices' => 'required|array|min:1',
-                'choices.*.texte_choix' => 'required|string|max:255',
-                'choices.*.est_correct' => 'required|boolean',
-            ]);
-
-            $question = Question::find($validated['question_id']);
-            $createdChoices = [];
-
-            foreach ($validated['choices'] as $choiceData) {
-                $choiceData['question_id'] = $validated['question_id'];
-                $createdChoices[] = ChoixReponse::create($choiceData);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $createdChoices,
-                'message' => count($createdChoices) . ' answer choices created successfully'
-            ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-                'message' => 'Validation failed'
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create answer choices: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

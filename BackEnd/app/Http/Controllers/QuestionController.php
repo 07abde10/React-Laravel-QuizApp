@@ -195,40 +195,4 @@ class QuestionController extends Controller
             ], 500);
         }
     }
-
-    public function bulkCreate(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'quiz_id' => 'required|exists:quizzes,id',
-                'questions' => 'required|array|min:1',
-                'questions.*.enonce' => 'required|string',
-                'questions.*.type_question' => 'required|in:QCM3,QCM4',
-                'questions.*.points' => 'required|numeric|min:0',
-            ]);
-
-            $createdQuestions = [];
-            foreach ($validated['questions'] as $questionData) {
-                $questionData['quiz_id'] = $validated['quiz_id'];
-                $createdQuestions[] = Question::create($questionData);
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => $createdQuestions,
-                'message' => count($createdQuestions) . ' questions created successfully'
-            ], 201);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'errors' => $e->errors(),
-                'message' => 'Validation failed'
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create questions: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }
