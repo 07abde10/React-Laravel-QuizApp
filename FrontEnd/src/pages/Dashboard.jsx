@@ -1,53 +1,63 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { authService, quizService } from '../services/api';
-import './Dashboard.css';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { CiClock2 } from "react-icons/ci";
+import { FaQuestionCircle } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
+import { FaKey } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
+import "./Dashboard.css";
 
 export default function Dashboard() {
-  const [user, setUser] = useState(null);
+  console.log("Dashboard component loaded");
   const [quizzes, setQuizzes] = useState([]);
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get quizzes for the first professor in the database
-        const quizzesResponse = await quizService.getAllQuizzes({ 
-          professeur_id: 1, // Use first professor
-          per_page: 50 
-        });
-        setQuizzes(quizzesResponse.data.data.data || []);
+        console.log("Fetching quizzes...");
+        const response = await fetch(
+          "http://localhost:8000/api/quizzes?professeur_id=1"
+        );
+        console.log("Response status:", response.status);
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("API result:", result);
+          // Handle nested data structure
+          const quizzesData = result.data?.data || result.data || [];
+          setQuizzes(Array.isArray(quizzesData) ? quizzesData : []);
+        } else {
+          setError("Failed to fetch quizzes");
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Fetch error:", error);
+        setError("Network error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [navigate]);
+  }, []);
 
-  const handleQuizClick = async (quiz) => {
-    navigate(`/quiz/${quiz.id}`);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('user');
-      navigate('/login');
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
   };
 
   if (loading) {
-    return <div className="dashboard-loading">Loading...</div>;
+    return <div style={{ padding: "20px", fontSize: "18px" }}>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: "20px", fontSize: "18px", color: "red" }}>
+        Error: {error}
+      </div>
+    );
   }
 
   return (
@@ -57,7 +67,10 @@ export default function Dashboard() {
           <h1>Quiz App</h1>
           <div className="user-menu">
             <span>Welcome to Quiz App!</span>
-            <button onClick={() => navigate('/quizzes/create')} className="btn-create">
+            <button
+              onClick={() => navigate("/quizzes/create")}
+              className="btn-create"
+            >
               Create Quiz
             </button>
             <button onClick={handleLogout} className="btn-logout">
@@ -71,7 +84,7 @@ export default function Dashboard() {
         <div className="dashboard-content">
           <section className="quizzes-section">
             <h2>My Quizzes</h2>
-            
+
             {quizzes.length === 0 ? (
               <p className="no-quizzes">
                 No quizzes created yet. Click "Create Quiz" to get started.
@@ -79,54 +92,46 @@ export default function Dashboard() {
             ) : (
               <div className="quizzes-grid">
                 {quizzes.map((quiz) => (
-                  <div 
-                    key={quiz.id} 
-                    className={`quiz-card ${selectedQuiz?.id === quiz.id ? 'selected' : ''}`}
-                    onClick={() => handleQuizClick(quiz)}
-                  >
+                  <div key={quiz.id} className="quiz-card">
                     <h3>{quiz.titre}</h3>
                     <p>{quiz.description}</p>
                     <div className="quiz-info">
-                      <span>⏱️ {quiz.duree} mins</span>
-                      <span>📝 {quiz.questions?.length || 0} questions</span>
-                      <span>🔑 {quiz.code_quiz}</span>
+                      <span>
+                        <CiClock2 />
+                        {quiz.duree} mins
+                      </span>
+                      <span>
+                        <FaQuestionCircle /> Questions
+                      </span>
+                      <span>
+                        <FaKey />
+                        {quiz.code_quiz}
+                      </span>
+                      <span
+                        className={`status ${
+                          quiz.actif ? "active" : "inactive"
+                        }`}
+                      >
+                        {quiz.actif ? (
+                          <>
+                            <FaCheck /> Active
+                          </>
+                        ) : (
+                          <><FaXmark /> Inactive</>
+                        )}
+                      </span>
                     </div>
-                    <button className="btn-primary">Start Quiz</button>
+                    <button
+                      className="btn-primary"
+                      onClick={() => navigate(`/quiz/${quiz.id}`)}
+                    >
+                      View Quiz
+                    </button>
                   </div>
                 ))}
               </div>
             )}
           </section>
-
-          {user?.role === 'Professeur' && selectedQuiz && (
-            <section className="analytics-section">
-              <h2>Quiz Analytics - {selectedQuiz.titre}</h2>
-              {analyticsLoading ? (
-                <div className="analytics-loading">Loading analytics...</div>
-              ) : analytics ? (
-                <div className="analytics-grid">
-                  <div className="stat-card">
-                    <div className="stat-number">{analytics.total_attempts}</div>
-                    <div className="stat-label">Total Attempts</div>
-                  </div>
-                  <div className="stat-card success">
-                    <div className="stat-number">{analytics.passed_count}</div>
-                    <div className="stat-label">Passed</div>
-                  </div>
-                  <div className="stat-card danger">
-                    <div className="stat-number">{analytics.failed_count}</div>
-                    <div className="stat-label">Failed</div>
-                  </div>
-                  <div className="stat-card">
-                    <div className="stat-number">{analytics.average_score}%</div>
-                    <div className="stat-label">Average Score</div>
-                  </div>
-                </div>
-              ) : (
-                <div className="analytics-error">Failed to load analytics</div>
-              )}
-            </section>
-          )}
         </div>
       </main>
     </div>

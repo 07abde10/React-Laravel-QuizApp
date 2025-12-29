@@ -5,6 +5,12 @@
   background: linear-gradient(to bottom right, #f8f9fa 0%, #e9ecef 100%);
   display: flex;
   flex-direction: column;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Admin Header */
@@ -95,6 +101,7 @@
   flex: 1;
   padding: 2.5rem 2rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* Table Header */
@@ -104,6 +111,7 @@
   align-items: center;
   margin-bottom: 2rem;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .table-header h2 {
@@ -191,6 +199,7 @@
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
 }
 
 .admin-table {
@@ -376,6 +385,36 @@
   gap: 1.25rem;
 }
 
+.admin-form label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.admin-form select {
+  padding: 0.875rem 1rem;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: #212529;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.admin-form select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.08);
+}
+
+.admin-form select:hover:not(:focus) {
+  border-color: #ced4da;
+}
+
 .admin-form input,
 .admin-form textarea {
   padding: 0.875rem 1rem;
@@ -388,6 +427,7 @@
   outline: none;
   width: 100%;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .admin-form textarea {
@@ -446,14 +486,6 @@
 
   .stat-number {
     font-size: 2rem;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .admin-table {
-    min-width: 800px;
   }
 }
 

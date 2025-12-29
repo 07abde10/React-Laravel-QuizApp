@@ -455,7 +455,7 @@ class AdminController extends Controller
                         $quiz->professeur->user->prenom . ' ' . $quiz->professeur->user->nom : 'N/A',
                     'module' => $quiz->module->nom_module ?? 'N/A',
                     'duree' => $quiz->duree . ' min',
-                    'actif' => $quiz->actif ? 'Yes' : 'No',
+                    'actif' => $quiz->actif,
                     'questions_count' => $quiz->questions()->count(),
                     'created_at' => $quiz->created_at->format('Y-m-d'),
                 ];
@@ -497,6 +497,58 @@ class AdminController extends Controller
                 'success' => false,
                 'message' => 'Failed to delete quiz: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function createQuiz(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'titre' => 'required|string',
+                'description' => 'nullable|string',
+                'duree' => 'required|integer|min:1',
+                'module_id' => 'required|exists:modules,id',
+            ]);
+
+            $quiz = Quiz::create([
+                'titre' => $validated['titre'],
+                'description' => $validated['description'],
+                'duree' => $validated['duree'],
+                'module_id' => $validated['module_id'],
+                'professeur_id' => 1, // Default professor
+                'code_quiz' => 'QUIZ_' . strtoupper(uniqid()),
+                'actif' => true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Quiz created successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create quiz: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateQuiz(Request $request, $id)
+    {
+        try {
+            $quiz = Quiz::find($id);
+            if (!$quiz) {
+                return response()->json(['success' => false, 'message' => 'Quiz not found'], 404);
+            }
+
+            $validated = $request->validate([
+                'actif' => 'required|boolean',
+            ]);
+
+            $quiz->update(['actif' => $validated['actif']]);
+
+            return response()->json(['success' => true, 'message' => 'Quiz updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update quiz: ' . $e->getMessage()], 500);
         }
     }
 
@@ -695,6 +747,7 @@ class AdminController extends Controller
                 'total_groups' => Groupe::count(),
                 'total_choices' => ChoixReponse::count(),
                 'total_responses' => ReponseEtudiant::count(),
+                'total_modules' => Module::count(),
                 'active_quizzes' => Quiz::where('actif', true)->count(),
                 'completed_attempts' => Tentative::where('statut', 'termine')->count(),
             ];

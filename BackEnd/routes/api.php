@@ -22,6 +22,12 @@ Route::prefix('auth')->group(function () {
     Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
 });
 
+Route::get('/academic-levels', function() {
+    return response()->json([
+        'success' => true,
+        'data' => \App\Models\Etudiant::select('niveau')->distinct()->whereNotNull('niveau')->pluck('niveau')
+    ]);
+});
 Route::get('/groups', function() {
     return response()->json([
         'success' => true,
@@ -123,6 +129,8 @@ Route::prefix('admin')->group(function () {
     
     // Quizzes
     Route::get('/quizzes', [AdminController::class, 'getQuizzes']);
+    Route::post('/quizzes', [AdminController::class, 'createQuiz']);
+    Route::put('/quizzes/{id}', [AdminController::class, 'updateQuiz']);
     Route::delete('/quizzes/{id}', [AdminController::class, 'deleteQuiz']);
     
     // Other routes (keeping existing ones)
