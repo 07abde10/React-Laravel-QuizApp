@@ -291,46 +291,4 @@ class ReponseEtudiantController extends Controller
             ], 500);
         }
     }
-
-    public function getStatistics($tentativeId)
-    {
-        try {
-            $tentative = Tentative::find($tentativeId);
-
-            if (!$tentative) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Attempt not found'
-                ], 404);
-            }
-
-            $responses = ReponseEtudiant::where('tentative_id', $tentativeId)
-                ->with('question')
-                ->get();
-
-            $correctCount = $responses->where('est_correct', true)->count();
-            $totalCount = $responses->count();
-            $totalPoints = $responses->where('est_correct', true)->sum(function ($response) {
-                return $response->question->points;
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'total_questions' => $totalCount,
-                    'correct_answers' => $correctCount,
-                    'incorrect_answers' => $totalCount - $correctCount,
-                    'accuracy_percentage' => $totalCount > 0 ? round(($correctCount / $totalCount) * 100, 2) : 0,
-                    'total_points_earned' => $totalPoints,
-                    'total_points_available' => $tentative->score_total,
-                ],
-                'message' => 'Statistics retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve statistics: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

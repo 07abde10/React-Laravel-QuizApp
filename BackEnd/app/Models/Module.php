@@ -10,7 +10,6 @@ class Module extends Model
         'code_module',
         'nom_module',
         'description',
-        // 'semestre',
     ];
 
     public function quizzes()

@@ -11,7 +11,6 @@ class Question extends Model
         'enonce',
         'type_question',
         'points',
-        // 'ordre',
     ];
 
     protected $casts = [

@@ -12,7 +12,6 @@ class ChoixReponse extends Model
         'question_id',
         'texte_choix',
         'est_correct',
-        // 'ordre',
     ];
 
     protected $casts = [

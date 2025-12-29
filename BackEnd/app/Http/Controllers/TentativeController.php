@@ -52,7 +52,6 @@ class TentativeController extends Controller
                 'date_passage' => 'nullable|date',
             ]);
 
-            // Set default student if none provided
             if (!isset($validated['etudiant_id'])) {
                 $firstStudent = Etudiant::first();
                 if ($firstStudent) {
@@ -80,9 +79,10 @@ class TentativeController extends Controller
                 'data' => $tentative->load(['etudiant', 'quiz']),
                 'message' => 'Quiz attempt started successfully'
             ], 201);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
+                'errors' => $e->errors(),
                 'message' => 'Validation failed'
             ], 422);
         } catch (\Exception $e) {
@@ -315,49 +315,6 @@ class TentativeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve quiz attempts: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function calculateScore($id)
-    {
-        try {
-            $tentative = Tentative::with('reponseEtudiants')->find($id);
-
-            if (!$tentative) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Attempt not found'
-                ], 404);
-            }
-
-            $score = 0;
-            $responses = $tentative->reponseEtudiants;
-
-            foreach ($responses as $response) {
-                if ($response->est_correct) {
-                    $score += $response->question->points;
-                }
-            }
-
-            $tentative->update([
-                'score_obtenu' => $score,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'tentative_id' => $tentative->id,
-                    'score_obtenu' => $score,
-                    'score_total' => $tentative->score_total,
-                    'percentage' => ($score / $tentative->score_total * 100),
-                ],
-                'message' => 'Score calculated successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to calculate score: ' . $e->getMessage()
             ], 500);
         }
     }

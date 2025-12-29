@@ -4,60 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
 use App\Models\Quiz;
-use App\Models\Question;
 use App\Models\Module;
-use App\Models\Tentative;
 use App\Models\Professeur;
 use App\Models\Etudiant;
 use App\Models\Groupe;
-use App\Models\ChoixReponse;
-use App\Models\ReponseEtudiant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    public function getUsers()
-    {
-        try {
-            $users = Utilisateur::with(['professeur', 'etudiant'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $users,
-                'message' => 'Users retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve users: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteUser($id)
-    {
-        try {
-            $user = Utilisateur::find($id);
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
-
-            $user->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete user: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function getStudents()
     {
         try {
@@ -312,139 +267,11 @@ class AdminController extends Controller
         }
     }
 
-    // Groups Management
-    public function getGroups()
-    {
-        try {
-            $groups = Groupe::withCount(['etudiants', 'quizzes'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $groups,
-                'message' => 'Groups retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve groups: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteGroup($id)
-    {
-        try {
-            $group = Groupe::find($id);
-            if (!$group) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Group not found'
-                ], 404);
-            }
-
-            $group->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Group deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete group: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // Answer Choices Management
-    public function getChoices()
-    {
-        try {
-            $choices = ChoixReponse::with(['question.quiz'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $choices,
-                'message' => 'Answer choices retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve choices: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteChoice($id)
-    {
-        try {
-            $choice = ChoixReponse::find($id);
-            if (!$choice) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Choice not found'
-                ], 404);
-            }
-
-            $choice->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Choice deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete choice: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // Student Responses Management
-    public function getResponses()
-    {
-        try {
-            $responses = ReponseEtudiant::with(['tentative.etudiant.user', 'question.quiz', 'choix'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $responses,
-                'message' => 'Student responses retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve responses: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteResponse($id)
-    {
-        try {
-            $response = ReponseEtudiant::find($id);
-            if (!$response) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Response not found'
-                ], 404);
-            }
-
-            $response->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Response deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete response: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // Existing methods...
     public function getQuizzes()
     {
         try {
             $quizzes = Quiz::with(['professeur.user', 'module'])->paginate(50);
             
-            // Transform data to show readable information instead of IDs
             $transformedData = $quizzes->getCollection()->map(function($quiz) {
                 return [
                     'id' => $quiz->id,
@@ -456,7 +283,6 @@ class AdminController extends Controller
                     'module' => $quiz->module->nom_module ?? 'N/A',
                     'duree' => $quiz->duree . ' min',
                     'actif' => $quiz->actif,
-                    'questions_count' => $quiz->questions()->count(),
                     'created_at' => $quiz->created_at->format('Y-m-d'),
                 ];
             });
@@ -473,6 +299,26 @@ class AdminController extends Controller
                 'success' => false,
                 'message' => 'Failed to retrieve quizzes: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function updateQuiz(Request $request, $id)
+    {
+        try {
+            $quiz = Quiz::find($id);
+            if (!$quiz) {
+                return response()->json(['success' => false, 'message' => 'Quiz not found'], 404);
+            }
+
+            $validated = $request->validate([
+                'actif' => 'required|boolean',
+            ]);
+
+            $quiz->update(['actif' => $validated['actif']]);
+
+            return response()->json(['success' => true, 'message' => 'Quiz updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update quiz: ' . $e->getMessage()], 500);
         }
     }
 
@@ -500,105 +346,11 @@ class AdminController extends Controller
         }
     }
 
-    public function createQuiz(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'titre' => 'required|string',
-                'description' => 'nullable|string',
-                'duree' => 'required|integer|min:1',
-                'module_id' => 'required|exists:modules,id',
-            ]);
-
-            $quiz = Quiz::create([
-                'titre' => $validated['titre'],
-                'description' => $validated['description'],
-                'duree' => $validated['duree'],
-                'module_id' => $validated['module_id'],
-                'professeur_id' => 1, // Default professor
-                'code_quiz' => 'QUIZ_' . strtoupper(uniqid()),
-                'actif' => true
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Quiz created successfully'
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create quiz: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function updateQuiz(Request $request, $id)
-    {
-        try {
-            $quiz = Quiz::find($id);
-            if (!$quiz) {
-                return response()->json(['success' => false, 'message' => 'Quiz not found'], 404);
-            }
-
-            $validated = $request->validate([
-                'actif' => 'required|boolean',
-            ]);
-
-            $quiz->update(['actif' => $validated['actif']]);
-
-            return response()->json(['success' => true, 'message' => 'Quiz updated successfully']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to update quiz: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function getQuestions()
-    {
-        try {
-            $questions = Question::with(['quiz', 'choixReponses'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $questions,
-                'message' => 'Questions retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve questions: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteQuestion($id)
-    {
-        try {
-            $question = Question::find($id);
-            if (!$question) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Question not found'
-                ], 404);
-            }
-
-            $question->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Question deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete question: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
     public function getModules()
     {
         try {
             $modules = Module::withCount('quizzes')->paginate(50);
             
-            // Transform data to show readable information
             $transformedData = $modules->getCollection()->map(function($module) {
                 return [
                     'id' => $module->id,
@@ -691,65 +443,16 @@ class AdminController extends Controller
         }
     }
 
-    public function getAttempts()
-    {
-        try {
-            $attempts = Tentative::with(['etudiant.user', 'quiz'])->paginate(50);
-            return response()->json([
-                'success' => true,
-                'data' => $attempts,
-                'message' => 'Attempts retrieved successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve attempts: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function deleteAttempt($id)
-    {
-        try {
-            $attempt = Tentative::find($id);
-            if (!$attempt) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Attempt not found'
-                ], 404);
-            }
-
-            $attempt->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Attempt deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete attempt: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // Dashboard Stats
     public function getStats()
     {
         try {
             $stats = [
-                'total_users' => Utilisateur::count(),
-                'total_professors' => Utilisateur::where('role', 'Professeur')->count(),
                 'total_students' => Utilisateur::where('role', 'Etudiant')->count(),
+                'total_professors' => Utilisateur::where('role', 'Professeur')->count(),
                 'total_admins' => Utilisateur::where('role', 'Administrateur')->count(),
                 'total_quizzes' => Quiz::count(),
-                'total_questions' => Question::count(),
-                'total_attempts' => Tentative::count(),
                 'total_groups' => Groupe::count(),
-                'total_choices' => ChoixReponse::count(),
-                'total_responses' => ReponseEtudiant::count(),
                 'total_modules' => Module::count(),
-                'active_quizzes' => Quiz::where('actif', true)->count(),
-                'completed_attempts' => Tentative::where('statut', 'termine')->count(),
             ];
 
             return response()->json([

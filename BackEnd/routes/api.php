@@ -17,9 +17,6 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/profile', [AuthController::class, 'profile']);
-    Route::put('/profile', [AuthController::class, 'updateProfile']);
-    Route::post('/refresh-token', [AuthController::class, 'refreshToken']);
 });
 
 Route::get('/academic-levels', function() {
@@ -56,7 +53,6 @@ Route::get('/debug/quizzes', function() {
 Route::prefix('quizzes')->group(function () {
     Route::get('/', [QuizController::class, 'index']);
     Route::post('/', [QuizController::class, 'store']);
-    Route::get('/group/{groupId}', [QuizController::class, 'getByGroup']);
     Route::put('/{id}', [QuizController::class, 'update']);
     Route::delete('/{id}', [QuizController::class, 'destroy']);
     Route::get('/{id}/statistics', [QuizController::class, 'statistics']);
@@ -79,7 +75,6 @@ Route::prefix('attempts')->group(function () {
     Route::put('/{id}', [TentativeController::class, 'update']);
     Route::delete('/{id}', [TentativeController::class, 'destroy']);
     Route::post('/{id}/finish', [TentativeController::class, 'finish']);
-    Route::post('/{id}/calculate-score', [TentativeController::class, 'calculateScore']);
     Route::get('/student/{etudiantId}', [TentativeController::class, 'getByStudent']);
     Route::get('/quiz/{quizId}', [TentativeController::class, 'getByQuiz']);
 });
@@ -92,7 +87,6 @@ Route::prefix('responses')->group(function () {
     Route::put('/{id}', [ReponseEtudiantController::class, 'update']);
     Route::delete('/{id}', [ReponseEtudiantController::class, 'destroy']);
     Route::get('/attempt/{tentativeId}', [ReponseEtudiantController::class, 'getByAttempt']);
-    Route::get('/attempt/{tentativeId}/statistics', [ReponseEtudiantController::class, 'getStatistics']);
 });
 
 Route::prefix('choices')->group(function () {
@@ -105,43 +99,25 @@ Route::prefix('choices')->group(function () {
     Route::get('/question/{questionId}', [ChoixReponseController::class, 'getByQuestion']);
 });
 
-// Admin Routes
 Route::prefix('admin')->group(function () {
     Route::get('/stats', [AdminController::class, 'getStats']);
     
-    // Students
     Route::get('/students', [AdminController::class, 'getStudents']);
     Route::post('/students', [AdminController::class, 'createStudent']);
     Route::put('/students/{id}', [AdminController::class, 'updateStudent']);
     Route::delete('/students/{id}', [AdminController::class, 'deleteStudent']);
     
-    // Professors
     Route::get('/professors', [AdminController::class, 'getProfessors']);
     Route::post('/professors', [AdminController::class, 'createProfessor']);
     Route::put('/professors/{id}', [AdminController::class, 'updateProfessor']);
     Route::delete('/professors/{id}', [AdminController::class, 'deleteProfessor']);
     
-    // Modules
     Route::get('/modules', [AdminController::class, 'getModules']);
     Route::post('/modules', [AdminController::class, 'createModule']);
     Route::put('/modules/{id}', [AdminController::class, 'updateModule']);
     Route::delete('/modules/{id}', [AdminController::class, 'deleteModule']);
     
-    // Quizzes
     Route::get('/quizzes', [AdminController::class, 'getQuizzes']);
-    Route::post('/quizzes', [AdminController::class, 'createQuiz']);
     Route::put('/quizzes/{id}', [AdminController::class, 'updateQuiz']);
     Route::delete('/quizzes/{id}', [AdminController::class, 'deleteQuiz']);
-    
-    // Other routes (keeping existing ones)
-    Route::get('/groups', [AdminController::class, 'getGroups']);
-    Route::delete('/groups/{id}', [AdminController::class, 'deleteGroup']);
-    Route::get('/choices', [AdminController::class, 'getChoices']);
-    Route::delete('/choices/{id}', [AdminController::class, 'deleteChoice']);
-    Route::get('/responses', [AdminController::class, 'getResponses']);
-    Route::delete('/responses/{id}', [AdminController::class, 'deleteResponse']);
-    Route::get('/questions', [AdminController::class, 'getQuestions']);
-    Route::delete('/questions/{id}', [AdminController::class, 'deleteQuestion']);
-    Route::get('/attempts', [AdminController::class, 'getAttempts']);
-    Route::delete('/attempts/{id}', [AdminController::class, 'deleteAttempt']);
 });
